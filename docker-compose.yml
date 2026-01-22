@@ -1,0 +1,101 @@
+# Docker Compose pour l'application CRUD de gestion de clients
+# Note: La version est obsolète dans les nouvelles versions de Docker Compose
+# Ce fichier orchestre tous les services : frontend, backend, MongoDB et MongoDB Compass
+
+services:
+  # ==================== BASE DE DONNÉES MONGODB ====================
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb-crud
+    restart: unless-stopped
+    ports:
+      - "27017:27017"  # Port MongoDB
+    environment:
+      - MONGO_INITDB_DATABASE=clientsdb
+    volumes:
+      # Volume nommé pour la persistance des données
+      # Les données resteront même après l'arrêt des conteneurs
+      - mongodb_data:/data/db
+    networks:
+      - crud-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== BACKEND API ====================
+  backend:
+    build:
+      context: .
+      dockerfile: ./docker/backend/Dockerfile
+    container_name: backend-crud
+    restart: unless-stopped
+    ports:
+      - "3000:3000"  # Port de l'API REST
+    environment:
+      - PORT=3000
+      - MONGODB_URI=mongodb://mongodb:27017/clientsdb
+      - NODE_ENV=production
+    volumes:
+      # Bind mount : le code source est monté pour permettre les modifications sans rebuild
+      - ./backend:/app
+      - /app/node_modules  # Volume anonyme pour éviter l'écrasement de node_modules
+    networks:
+      - crud-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    command: npm start
+
+  # ==================== FRONTEND ====================
+  frontend:
+    build:
+      context: .
+      dockerfile: ./docker/frontend/Dockerfile
+    container_name: frontend-crud
+    restart: unless-stopped
+    ports:
+      - "8080:80"  # Port d'accès au frontend (80 dans le conteneur, 8080 sur l'hôte)
+    volumes:
+      # Bind mount : les fichiers HTML/CSS/JS sont montés pour permettre les modifications sans rebuild
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - crud-network
+    depends_on:
+      - backend
+
+  # ==================== MONGODB COMPASS ====================
+  # MongoDB Compass est l'outil de visualisation et manipulation des données
+  # Note: Compass est une application desktop, mais on peut utiliser une alternative web
+  # Pour ce TP, on utilise mongo-express qui est un outil web similaire à Compass
+  compass:
+    image: mongo-express:latest
+    container_name: mongo-compass-crud
+    restart: unless-stopped
+    ports:
+      - "8081:8081"  # Port d'accès à Mongo Express
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongodb:27017/
+      - ME_CONFIG_BASICAUTH_USERNAME=admin
+      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+      - ME_CONFIG_MONGODB_SERVER=mongodb
+    networks:
+      - crud-network
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+# ==================== RÉSEAUX ====================
+# Tous les services communiquent via ce réseau
+networks:
+  crud-network:
+    driver: bridge
+    name: crud-network
+
+# ==================== VOLUMES ====================
+# Volume pour la persistance des données MongoDB
+volumes:
+  mongodb_data:
+    name: mongodb_data
+    driver: local

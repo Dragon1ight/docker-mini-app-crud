@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion de Clients - CRUD Application</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📋 Gestion de Clients</h1>
+            <p class="subtitle">Application CRUD avec Docker</p>
+        </header>
+
+        <!-- Formulaire d'ajout/modification -->
+        <section class="form-section">
+            <h2 id="form-title">Ajouter un nouveau client</h2>
+            <form id="client-form">
+                <input type="hidden" id="client-id" value="">
+                
+                <div class="form-group">
+                    <label for="nom">Nom *</label>
+                    <input type="text" id="nom" name="nom" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="prenom">Prénom *</label>
+                    <input type="text" id="prenom" name="prenom" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telephone">Téléphone</label>
+                    <input type="tel" id="telephone" name="telephone">
+                </div>
+
+                <div class="form-group">
+                    <label for="adresse">Adresse</label>
+                    <textarea id="adresse" name="adresse" rows="3"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" id="submit-btn">Ajouter</button>
+                    <button type="button" id="cancel-btn" style="display: none;">Annuler</button>
+                </div>
+            </form>
+        </section>
+
+        <!-- Liste des clients -->
+        <section class="list-section">
+            <h2>Liste des clients</h2>
+            <div id="loading" class="loading">Chargement...</div>
+            <div id="error-message" class="error-message" style="display: none;"></div>
+            <div id="clients-list" class="clients-list"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
