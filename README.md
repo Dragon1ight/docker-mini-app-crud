@@ -9,10 +9,12 @@ Cette application est une mini-application CRUD (Create, Read, Update, Delete) f
 
 ### Groupe
 - **Classe** : Master 2 - Architecte Web
-- **Étudiants** : Khalid ZAÏM
-                  Youssef Kaddouhi
-                  Omar EL ASRI
-                  Ayoub CHAOUI
+- **Étudiants** :
+  - Khalid ZAÏM
+  - Youssef KADDOUHI
+  - Omar EL ASRI
+  - Ayoub CHAOUI
+
 
 ---
 
